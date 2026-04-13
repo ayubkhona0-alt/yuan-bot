@@ -1,27 +1,40 @@
-name: Daily Yuan Rate
+import os
+import requests
 
-on:
-  schedule:
-    - cron: "0 4 * * *"
-  workflow_dispatch:
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+CHANNEL_ID = "@beshsomm"
 
-jobs:
-  send-rate:
-    runs-on: ubuntu-latest
+def get_rate():
+    url = "https://open.er-api.com/v6/latest/CNY"
+    data = requests.get(url, timeout=20).json()
+    rate = data["rates"]["UZS"]
+    updated = data.get("time_last_update_utc", "Unknown")
+    return rate, updated
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+def send_message(text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": CHANNEL_ID,
+        "text": text
+    }
+    r = requests.post(url, data=payload, timeout=20)
+    r.raise_for_status()
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+def main():
+    rate, updated = get_rate()
 
-      - name: Install requests
-        run: pip install requests
+    text = f"""💴 Курс юаня (CNY)
 
-      - name: Run bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python bot.py
+📊 Сегодня: {rate} UZS
+🕒 Обновлено: {updated}
+
+📦 Китай → Узбекистан
+🚚 Доставка 13–16 дней
+
+👉 @beshsomm
+"""
+
+    send_message(text)
+
+if name == "__main__":
+    main()
