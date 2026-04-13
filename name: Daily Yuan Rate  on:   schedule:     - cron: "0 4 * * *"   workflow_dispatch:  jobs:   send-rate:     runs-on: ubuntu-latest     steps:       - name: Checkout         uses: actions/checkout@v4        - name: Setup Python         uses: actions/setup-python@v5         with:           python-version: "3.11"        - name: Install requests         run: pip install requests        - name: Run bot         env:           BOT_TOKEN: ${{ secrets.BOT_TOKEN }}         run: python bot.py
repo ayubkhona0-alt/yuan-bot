@@ -6,8 +6,10 @@ CHANNEL_ID = "@beshsomm"
 
 def get_rate():
     url = "https://open.er-api.com/v6/latest/CNY"
-    data = requests.get(url).json()
-    return data["rates"]["UZS"]
+    data = requests.get(url, timeout=20).json()
+    rate = data["rates"]["UZS"]
+    updated = data.get("time_last_update_utc", "Unknown")
+    return rate, updated
 
 def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -15,25 +17,16 @@ def send_message(text):
         "chat_id": CHANNEL_ID,
         "text": text
     }
-    requests.post(url, data=payload)
+    r = requests.post(url, data=payload, timeout=20)
+    r.raise_for_status()
 
 def main():
-    today_rate = get_rate()
-
-    # Простая логика изменения (пример)
-    change = round(today_rate - 1770, 2)
-
-    if change > 0:
-        trend = "📈 Рост"
-    elif change < 0:
-        trend = "📉 Падение"
-    else:
-        trend = "➖ Без изменений"
+    rate, updated = get_rate()
 
     text = f"""💴 Курс юаня (CNY)
 
 📊 Сегодня: {rate} UZS
-{trend}: {change} UZS
+🕒 Обновлено: {updated}
 
 📦 Китай → Узбекистан
 🚚 Доставка 13–16 дней
