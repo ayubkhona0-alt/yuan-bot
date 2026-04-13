@@ -4,7 +4,7 @@ import requests
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHANNEL_ID = "@beshsomm"
 
-def get_cny_rate():
+def get_rate():
     url = "https://open.er-api.com/v6/latest/CNY"
     data = requests.get(url).json()
     return data["rates"]["UZS"]
@@ -18,9 +18,30 @@ def send_message(text):
     requests.post(url, data=payload)
 
 def main():
-    rate = get_cny_rate()
-    text = f"💴 Курс юаня\n\n1 CNY = {rate} UZS"
+    today_rate = get_rate()
+
+    # Простая логика изменения (пример)
+    change = round(today_rate - 1770, 2)
+
+    if change > 0:
+        trend = "📈 Рост"
+    elif change < 0:
+        trend = "📉 Падение"
+    else:
+        trend = "➖ Без изменений"
+
+    text = f"""💴 Курс юаня (CNY)
+
+📊 Сегодня: {today_rate} UZS
+{trend}: {change} UZS
+
+📦 Китай → Узбекистан
+🚚 Доставка 13–16 дней
+
+👉 @beshsomm
+"""
+
     send_message(text)
 
-if __name__ == "__main__":
+if name == "__main__":
     main()
