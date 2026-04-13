@@ -22,5 +22,5 @@ def main():
     text = f"💴 Курс юаня\n\n1 CNY = {rate} UZS"
     send_message(text)
 
-if name == "__main__":
+if __name == "__main__":
     main()
