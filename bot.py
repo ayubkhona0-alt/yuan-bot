@@ -32,7 +32,7 @@ def main():
 
     text = f"""💴 Курс юаня (CNY)
 
-📊 Сегодня: {today_rate} UZS
+📊 Сегодня: {rate} UZS
 {trend}: {change} UZS
 
 📦 Китай → Узбекистан
